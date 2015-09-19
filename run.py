@@ -1,19 +1,37 @@
 import os
 import logging
+import random
 from flask import Flask, Response, request, url_for
+from flask.ext.sqlalchemy import SQLAlchemy
 from tropo import Tropo 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+db = SQLAlchemy(app)
 
+class User(db.Model):
+    userid = db.Column(db.Integer, primary_key=True)
+    voice_query = db.Column(db.Text())
+
+    def __repr__(self):
+        return '<User id %d>' % self.userid
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    # Generate a user cookie value.  This is kept in the url args throughout
+    # the session.
+    user = User()
+    db.session.add(user)
+    db.session.commit()
+    userid = user.userid
+
     t = Tropo()
     t.record(
         name='myrecording',
         say='speech recognition demo',
         choices={'terminator': '#'},
-        url='http://infinite-cove-6526.herokuapp.com/record?userid=12345',
+        url='http://infinite-cove-6526.herokuapp.com/record?userid={0}' \
+            .format(userid),
         asyncUpload=True,
     )
     t.on(event='continue', next='/success')
@@ -42,9 +60,15 @@ def error():
 @app.route('/record', methods=['GET', 'POST'])
 def record():
     print "Recording received!"
-    print request.args
-    print request.files
-    print request.form
+
+    userid = int(request.args['userid'])
+    print "User: ", userid
+    this_user = User.query.filter_by(userid=userid).first()
+
+    audio = request.files['filename'].read()
+    this_user.voice_query = audio
+    db.session.commit()
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
