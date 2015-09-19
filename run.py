@@ -5,12 +5,16 @@ from tropo import Tropo
 app = Flask(__name__)
 
 
-@app.route('/home', methods=['GET', 'POST'])
+@app.route('/home/', methods=['GET', 'POST'])
 def home():
     t = Tropo()
-    t.record('speech recognition demo',
-        transcription='mailto:fephsun@gmail.com',
-    )
+    # t.record(
+    #     name='myrecording',
+    #     say='speech recognition demo',
+    #     transcription={'id': '1234', 'url':'mailto:fephsun@gmail.com'},
+    #     url='http://blah.com',
+    # )
+    t.say("wtf?")
     return t.RenderJson()
 
 
