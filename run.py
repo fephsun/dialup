@@ -9,7 +9,7 @@ app = Flask(__name__)
 def home():
     t = Tropo()
     t.record('speech recognition demo',
-        'transcription':'mailto:fephsun@gmail.com',
+        transcription='mailto:fephsun@gmail.com',
     )
     return t.RenderJson()
 
