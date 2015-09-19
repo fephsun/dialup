@@ -38,8 +38,10 @@ def error():
     t.say('error')
     return t.RenderJson()
 
-@app.route('/record', mathods=['GET', 'POST'])
+@app.route('/record', methods=['GET', 'POST'])
 def record():
+    print "Recording received!"
+    print request.files
     print request.form
 
 if __name__ == '__main__':
