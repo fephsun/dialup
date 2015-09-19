@@ -70,7 +70,7 @@ class ParsedWebpage(object):
         # Replace images with descriptions of those images.
         def my_replace(match):
             raw_tag = match.group()
-            img_soup = bs4.BeautifulSoup(raw_tag)
+            img_soup = bs4.BeautifulSoup(raw_tag, "html.parser")
             src = img_soup.img.get("src")
             alt = img_soup.img.get("alt")
 
