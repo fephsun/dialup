@@ -1,4 +1,4 @@
-import os
+import sys, os
 import logging
 import random
 from flask import Flask, Response, request, url_for
