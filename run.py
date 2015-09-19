@@ -1,4 +1,5 @@
 import os
+import logging
 from flask import Flask, Response, request, url_for
 from tropo import Tropo 
 
@@ -11,10 +12,14 @@ def home():
     t.record(
         name='myrecording',
         say='speech recognition demo',
-        transcription={'id': '1234', 'url':'mailto:fephsun@gmail.com'},
-        choices = {"terminator": "#"},
+        choices={'terminator': '#'},
+        url='./voice_downloader',
     )
     return t.RenderJson()
+
+@app.route('/home/voice_downloader', methods=['POST'])
+def get_voice():
+    print request.form
 
 
 if __name__ == '__main__':
