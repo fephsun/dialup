@@ -8,13 +8,12 @@ app = Flask(__name__)
 @app.route('/home/', methods=['GET', 'POST'])
 def home():
     t = Tropo()
-    # t.record(
-    #     name='myrecording',
-    #     say='speech recognition demo',
-    #     transcription={'id': '1234', 'url':'mailto:fephsun@gmail.com'},
-    #     url='http://blah.com',
-    # )
-    t.say("wtf?")
+    t.record(
+        name='myrecording',
+        say='speech recognition demo',
+        transcription={'id': '1234', 'url':'mailto:fephsun@gmail.com'},
+        url='http://blah.com',
+    )
     return t.RenderJson()
 
 
