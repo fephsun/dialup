@@ -2,6 +2,14 @@
 Parse out text, links, images, and more from an HTML file.
 
 http://www.crummy.com/software/BeautifulSoup/bs4/doc/
+
+
+For example:
+    import extract
+    e = extract.ParsedWebpage("http://en.wikipedia.org/wiki/Frog")
+    print e.title
+    print e.text
+    print e.links
 """
 
 import copy
@@ -14,7 +22,7 @@ import requests
 
 import secrets
 
-def clarifai_tags(url):
+def _clarifai_tags(url):
     # TODO: Batch this so that we do one Clarifai request only.
     # Requires, like, deferreds.
 
@@ -22,8 +30,16 @@ def clarifai_tags(url):
     clarifai_url = "https://api.clarifai.com/v1/tag/?url="
     response = requests.get(clarifai_url + url,
         headers={'Authorization': ' Bearer %s' % access_token})
-    return json.loads(response.text)['results'][0]['result']['tag']['classes']
-    return ["space", "stars", "galaxy"]
+
+    # Consult https://developer.clarifai.com/docs/tag
+    retval = json.loads(response.text)['results'][0]['result']['tag']['classes']
+
+    # Sometimes Clarifai returns [["tag1", "tag2", "tag3"]] instead of
+    # just ["tag1", "tag2", "tag3"].
+    if len(retval) == 1 and type(retval[0]) == list:
+        return retval[0]
+
+    return retval
 
 class ParsedWebpage(object):
     def __init__(self, url):
@@ -35,29 +51,23 @@ class ParsedWebpage(object):
 
         self.soup = bs4.BeautifulSoup(self.html, "html.parser")
 
-        # Delete <script> and <style> tags
-        [s.extract() for s in self.soup.find_all('script')]
-        [s.extract() for s in self.soup.find_all('style')]
-        [s.extract() for s in self.soup.find_all('form')]
-        comments = self.soup.findAll(text=lambda text:isinstance(text, bs4.Comment))
-        [comment.extract() for comment in comments]
-        new_html = re.sub("<!--.*?-->", "", unicode(self.soup))
-        self.soup = bs4.BeautifulSoup(new_html, "html.parser")
-
-        # For some reason, a second round of this removes some sticky cases
-        [s.extract() for s in self.soup.find_all('script')]
-        [s.extract() for s in self.soup.find_all('style')]
-        [s.extract() for s in self.soup.find_all('form')]
-        comments = self.soup.findAll(text=lambda text:isinstance(text, bs4.Comment))
-        [comment.extract() for comment in comments]
-        new_html = re.sub("<!--.*?-->", "", unicode(self.soup))
-        self.soup = bs4.BeautifulSoup(new_html, "html.parser")
+        # Delete <script> and <style> tags, comments, and <!DOCTYPE>.
+        # For some reason, doing this twice removes some sticky cases.
+        for i in range(2):
+            [s.extract() for s in self.soup.find_all('script')]
+            [s.extract() for s in self.soup.find_all('style')]
+            [s.extract() for s in self.soup.find_all('form')]
+            comments = self.soup.findAll(text=lambda text:isinstance(text, bs4.Comment))
+            [comment.extract() for comment in comments]
+            new_html = re.sub("<!--.*?-->", "", unicode(self.soup))
+            new_html = re.sub("<!DOCTYPE[^>]*>", "", new_html)
+            self.soup = bs4.BeautifulSoup(new_html, "html.parser")
 
         # This should be something acceptable to read to the user
         # as the webpage's title.
         self.title = self.soup.title.string
 
-        # Replace images with descriptions.
+        # Replace images with descriptions of those images.
         def my_replace(match):
             raw_tag = match.group()
             img_soup = bs4.BeautifulSoup(raw_tag)
@@ -65,15 +75,15 @@ class ParsedWebpage(object):
             alt = img_soup.img.get("alt")
 
             retval = " An image"
-
-            tags = []
-
             if alt:
                 retval += " of %s" % alt
             if src:
-                retval += "; it looks like "
+                retval += " that looks like "
                 joined_url = urljoin(url, src)
-                retval += ', '.join(clarifai_tags(joined_url)[:5])
+                tags = _clarifai_tags(joined_url)[:5]
+                if len(tags) > 1:
+                    tags[-1] = "and " + tags[-1]
+                retval += ', '.join(tags)
             return retval + '. '
 
         new_html = re.sub("<img[^>]*\>[^>]*<\\img\>", my_replace, unicode(self.soup))
@@ -84,13 +94,13 @@ class ParsedWebpage(object):
 
         # This should be a list of (link name, link href) pairs.
         links = self.soup.find_all('a')
-        self.links = [(link.string, urljoin(url, link['href']))
+        self.links = [(link.string, urljoin(url, link.get('href', '')))
                       for link in links
                       if link.string]
 
         # This should be a list of img srcs.
         imgs = self.soup.find_all('img')
-        self.imgs = [img['src'] for img in imgs]
+        self.imgs = [img.get('src', '') for img in imgs]
 
         texts = self.soup.find_all(text=True)
 
