@@ -13,14 +13,11 @@ def home():
         name='myrecording',
         say='speech recognition demo',
         choices={'terminator': '#'},
-        url='http://infinite-cove-6526.herokuapp.com/home/voice_downloader/',
+        url='ftp://ftp.dialup.mit.edu:/mit/felixsun/test.wav',
+        username='felixsun',
+        password=os.environ['athena_pw'],
     )
     return t.RenderJson()
-
-@app.route('/home/voice_downloader/', methods=['POST'])
-def get_voice():
-    print request.form
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
