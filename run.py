@@ -1,7 +1,7 @@
 import sys, os
 import logging
 import random
-from flask import Flask, Response, request, url_for
+from flask import Flask, Response, request, url_for, send_file
 from flask.ext.sqlalchemy import SQLAlchemy
 from tropo import Tropo 
 
@@ -71,9 +71,10 @@ def record():
     this_user = User.query.filter_by(userid=userid).first()
 
     audio = request.files['filename'].read()
+    out_file = file('./test.wav', 'wb')
     this_user.voice_query = audio
+    out_file.write(audio)
     db.session.commit()
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
