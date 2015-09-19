@@ -38,10 +38,11 @@ def home():
         url='http://infinite-cove-6526.herokuapp.com/record?userid={0}' \
             .format(userid),
         asyncUpload=True,
+        maxTime=10,
     )
-    t.on(event='continue', next='/success')
-    t.on(event='incomplete', next='/incomplete')
-    t.on(event='error', next='/error')
+    t.on(event='continue', next='./success')
+    t.on(event='incomplete', next='./incomplete')
+    t.on(event='error', next='./error')
     return t.RenderJson()
 
 @app.route('/success')
@@ -71,10 +72,11 @@ def record():
     this_user = User.query.filter_by(userid=userid).first()
 
     audio = request.files['filename'].read()
-    out_file = file('./test.wav', 'wb')
+    out_file = file('/usr/local/etc/test.wav', 'wb')
     this_user.voice_query = audio
     out_file.write(audio)
     db.session.commit()
+    return ""
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
