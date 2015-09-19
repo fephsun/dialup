@@ -13,9 +13,7 @@ def home():
         name='myrecording',
         say='speech recognition demo',
         choices={'terminator': '#'},
-        url='ftp://ftp.dialup.mit.edu:/mit/felixsun/test.wav',
-        username='felixsun',
-        password=os.environ['athena_pw'],
+        url='http://infinite-cove-6526.herokuapp.com/record',
     )
     t.on(event='continue', next='/success')
     t.on(event='incomplete', next='/incomplete')
@@ -26,16 +24,23 @@ def home():
 def success():
     t = Tropo()
     t.say('Success')
+    return t.RenderJson()
 
 @app.route('/incomplete')
 def incomplete():
     t = Tropo()
     t.say('incomplete')
+    return t.RenderJson()
 
 @app.route('/error')
 def error():
     t = Tropo()
     t.say('error')
+    return t.RenderJson()
+
+@app.route('/record', mathods=['GET', 'POST'])
+def record():
+    print request.form
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
