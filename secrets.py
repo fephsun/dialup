@@ -1,4 +1,4 @@
-is_dev_server = True
+is_dev_server = False
 
 if is_dev_server:
     from actual_secrets import *
