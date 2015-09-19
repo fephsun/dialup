@@ -2,3 +2,4 @@ gunicorn
 Flask>=0.8
 twilio>=3.3.6
 beautifulsoup4==4.4.0
+requests==2.7.0

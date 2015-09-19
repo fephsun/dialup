@@ -5,17 +5,33 @@ http://www.crummy.com/software/BeautifulSoup/bs4/doc/
 """
 
 import copy
+import json
 import re
-import urllib2
+from urlparse import urljoin
 
 import bs4
+import requests
+
+import secrets
+
+def clarifai_tags(url):
+    # TODO: Batch this so that we do one Clarifai request only.
+    # Requires, like, deferreds.
+
+    access_token = secrets.clarifai_access_token
+    clarifai_url = "https://api.clarifai.com/v1/tag/?url="
+    response = requests.get(clarifai_url + url,
+        headers={'Authorization': ' Bearer %s' % access_token})
+    return json.loads(response.text)['results'][0]['result']['tag']['classes']
+    return ["space", "stars", "galaxy"]
 
 class ParsedWebpage(object):
     def __init__(self, url):
         self.url = url
 
         # Raw HTML
-        self.html = urllib2.urlopen(url).read()
+        response = requests.get(url)
+        self.html = response.text
 
         self.soup = bs4.BeautifulSoup(self.html, "html.parser")
 
@@ -41,9 +57,35 @@ class ParsedWebpage(object):
         # as the webpage's title.
         self.title = self.soup.title.string
 
+        # Replace images with descriptions.
+        def my_replace(match):
+            raw_tag = match.group()
+            img_soup = bs4.BeautifulSoup(raw_tag)
+            src = img_soup.img.get("src")
+            alt = img_soup.img.get("alt")
+
+            retval = " An image"
+
+            tags = []
+
+            if alt:
+                retval += " of %s" % alt
+            if src:
+                retval += "; it looks like "
+                joined_url = urljoin(url, src)
+                retval += ', '.join(clarifai_tags(joined_url)[:5])
+            return retval + '. '
+
+        new_html = re.sub("<img[^>]*\>[^>]*<\\img\>", my_replace, unicode(self.soup))
+        new_html = re.sub("<img[^>]*\>", my_replace, new_html)
+        self.soup = bs4.BeautifulSoup(new_html, "html.parser")
+
+
+
         # This should be a list of (link name, link href) pairs.
         links = self.soup.find_all('a')
-        self.links = [(link.string, link['href']) for link in links
+        self.links = [(link.string, urljoin(url, link['href']))
+                      for link in links
                       if link.string]
 
         # This should be a list of img srcs.
