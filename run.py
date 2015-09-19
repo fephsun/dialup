@@ -47,18 +47,21 @@ def home():
 
 @app.route('/success')
 def success():
+    print "success"
     t = Tropo()
     t.say('Success')
     return t.RenderJson()
 
 @app.route('/incomplete')
 def incomplete():
+    print "incomplete"
     t = Tropo()
     t.say('incomplete')
     return t.RenderJson()
 
 @app.route('/error')
 def error():
+    print "error"
     t = Tropo()
     t.say('error')
     return t.RenderJson()
@@ -72,7 +75,7 @@ def record():
     this_user = User.query.filter_by(userid=userid).first()
 
     audio = request.files['filename'].read()
-    out_file = file('/usr/local/etc/test.wav', 'wb')
+    out_file = file('~/test.wav', 'wb')
     this_user.voice_query = audio
     out_file.write(audio)
     db.session.commit()
