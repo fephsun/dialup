@@ -12,7 +12,7 @@ def home():
         name='myrecording',
         say='speech recognition demo',
         transcription={'id': '1234', 'url':'mailto:fephsun@gmail.com'},
-        url='http://blah.com',
+        choices = {"terminator": "#"},
     )
     return t.RenderJson()
 
