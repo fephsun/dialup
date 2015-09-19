@@ -75,7 +75,7 @@ def record():
     this_user = User.query.filter_by(userid=userid).first()
 
     audio = request.files['filename'].read()
-    out_file = file('~/test.wav', 'wb')
+    out_file = file('./test.wav', 'wb')
     this_user.voice_query = audio
     out_file.write(audio)
     db.session.commit()
