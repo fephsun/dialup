@@ -5,6 +5,11 @@ from flask import Flask, Response, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from tropo import Tropo 
 
+root = logging.getLogger()
+log = logging.StreamHandler(sys.stdout)
+log.setLevel(logging.DEBUG)
+root.addHandler(log)
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
