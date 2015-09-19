@@ -13,7 +13,8 @@ def home():
         name='myrecording',
         say='speech recognition demo',
         choices={'terminator': '#'},
-        url='http://infinite-cove-6526.herokuapp.com/record',
+        url='http://infinite-cove-6526.herokuapp.com/record?userid=12345',
+        asyncUpload=True,
     )
     t.on(event='continue', next='/success')
     t.on(event='incomplete', next='/incomplete')
@@ -41,6 +42,7 @@ def error():
 @app.route('/record', methods=['GET', 'POST'])
 def record():
     print "Recording received!"
+    print request.args
     print request.files
     print request.form
 
