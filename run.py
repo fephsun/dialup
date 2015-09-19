@@ -5,6 +5,8 @@ from flask import Flask, Response, request, url_for, send_file
 from flask.ext.sqlalchemy import SQLAlchemy
 from tropo import Tropo 
 
+import recognize
+
 root = logging.getLogger()
 log = logging.StreamHandler(sys.stdout)
 log.setLevel(logging.DEBUG)
@@ -79,6 +81,11 @@ def record():
     this_user.voice_query = audio
     out_file.write(audio)
     db.session.commit()
+
+    # Test speech recognition
+    text = recognize.wav_to_text('./text.wav')
+    print "Text back: ", text
+
     return ""
 
 if __name__ == '__main__':
