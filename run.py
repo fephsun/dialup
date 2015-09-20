@@ -63,7 +63,9 @@ def wait_for_recog():
     if len(user.voice_query) > 0:
         t.say("Your query was " + user.voice_query)
         url = im_feeling_lucky(user.voice_query)
-        t.on(event='continue', next='/speak_webpage?url={0}&userid={1},'.format(url, userid))
+        print "line 66"
+        t.on(event='continue', next='/speak_webpage?url={0}&userid={1}'.format(url, userid))
+        print "line 68"
     else:
         t.say("Loading")
         t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
@@ -95,6 +97,7 @@ def record():
 
 @app.route('/speak_webpage', methods=['GET', 'POST'])
 def speak_webpage():
+    print "speak_webpage"
     t = Tropo()
     userid = request.args.get('userid', None)
     if userid is None:
