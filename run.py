@@ -99,10 +99,7 @@ def speak_webpage():
         t.say("Server error: No URL specified.")
     else:
         webpage = extract.ParsedWebpage(url)
-        t.ask(webpage.text, {
-            'choices': "[1-4 DIGITS]",
-            'onChoice': lambda event: say(str(event)),
-        })
+        t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice = lambda event: say(str(event))))
 
     return t.RenderJson()
 
