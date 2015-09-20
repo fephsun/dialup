@@ -100,8 +100,8 @@ def speak_webpage():
     else:
         webpage = extract.ParsedWebpage(url)
         t.ask(webpage.text, {
-            choices: "[1-4 DIGITS]",
-            onChoice: lambda event: say(str(event)),
+            'choices': "[1-4 DIGITS]",
+            'onChoice': lambda event: say(str(event)),
         })
 
     return t.RenderJson()
