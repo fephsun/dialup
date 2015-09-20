@@ -83,11 +83,11 @@ class ParsedWebpage(object):
                 retval += " of %s" % alt
             if src:
                 retval += " that looks like "
-                joined_url = urljoin(url, src)
+                joined_url = urljoin(self.url, src)
                 tags = _clarifai_tags(joined_url)[:4]
                 if len(tags) > 1:
                     tags[-1] = "and " + tags[-1]
-                retval += ', '.join(tags)
+                retval += ' '.join(tags)
             return retval + '. '
 
         new_html = re.sub("<img[^>]*\>[^>]*<\\img\>", my_replace, unicode(self.soup))
@@ -109,7 +109,7 @@ class ParsedWebpage(object):
         new_texts = []
         for text in texts:
             if link_index < len(self.links) and text == self.links[link_index][0]:
-                new_texts.append("Link %s" % str(link_index))
+                # new_texts.append("Link %s" % str(link_index))
                 link_index += 1
             if text.strip() != '':
                 new_texts.append(text)
