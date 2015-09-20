@@ -119,10 +119,17 @@ def speak_webpage():
     webpage = extract.ParsedWebpage(url)
     page_n = int(request.args['page'])
     # t.say(webpage.text)
-    t.ask(Choices('[1-4 DIGITS]'),
+    t.ask(
+        choices='link([1-4 DIGITS]), command(next, home)',
         say=webpage.chunks[page_n],
-        bargein=False,
-        onChoice=lambda event: say(str(event)))
+    )
+    t.on(event='continue', next='/deal_with_links&userid={0}'.format(userid))
+    return t.RenderJson()
+
+@app.route('/deal_with_links', methods=['GET', 'POST'])
+def deal_with_links():
+    t = Tropo()
+    t.say("Not implemented")
     return t.RenderJson()
 
 if __name__ == '__main__':
