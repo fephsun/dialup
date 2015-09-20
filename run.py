@@ -80,6 +80,7 @@ def record():
     this_user = User.query.filter_by(userid=userid).first()
 
     audio = request.files['filename'].read()
+    print "Audio file size: ", len(audio)
     wav_filename = '/tmp/test{0}.wav'.format(userid)
     out_file = open(wav_filename, 'wb')
     out_file.write(audio)
