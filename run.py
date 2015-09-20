@@ -101,8 +101,7 @@ def speak_webpage():
         t.say("No user specified. Error.")
         return t.RenderJson()
     userid = int(userid)
-    this_user = User.query.filter_by(userid=userid).first()
-    query = this_user.voice_query
+
     url = request.args.get('url', None)
     if not url:
         t.say("No URL specified. Server error.")
