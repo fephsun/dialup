@@ -67,7 +67,7 @@ def wait_for_recog():
         print "Bad query"
         t.say("We couldn't understand you.")
         t.on(event='continue', next='/home')
-    elif len(user.voice_query) > 0:
+    elif user.voice_query is not None and len(user.voice_query) > 0:
         print "Query-get!"
         t.say("Your query was " + user.voice_query)
         t.on(event='continue', next='/speak_webpage?userid={0}&page=0'.format(userid))
