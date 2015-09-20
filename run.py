@@ -138,8 +138,8 @@ def deal_with_links():
     webpage = extract.ParsedWebpage(url)
 
     # Get the action from last time.
-    print request.form
-    result = Result(request.form)
+    print "Request data: ", request.data
+    result = Result(request.data)
     if result.getValue() == 'link':
         t.say("You clicked on a link")
     elif result.getValue() == 'command':
