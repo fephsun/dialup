@@ -84,7 +84,7 @@ class ParsedWebpage(object):
             if src:
                 retval += " that looks like "
                 joined_url = urljoin(url, src)
-                tags = _clarifai_tags(joined_url)[:5]
+                tags = _clarifai_tags(joined_url)[:4]
                 if len(tags) > 1:
                     tags[-1] = "and " + tags[-1]
                 retval += ', '.join(tags)
