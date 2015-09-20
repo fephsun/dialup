@@ -43,32 +43,33 @@ def home():
             .format(userid),
         asyncUpload=True,
         maxTime=10,
+        maxSilence=2,
     )
-    t.on(event='continue', next='/success')
-    t.on(event='incomplete', next='/incomplete')
-    t.on(event='error', next='/error')
+    t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
+    t.on(event='incomplete', next='/home')
+    t.on(event='error', next='/home')
     return t.RenderJson()
 
-@app.route('/success', methods=['GET', 'POST'])
-def success():
-    print "success"
+@app.route('/wait_for_recog', methods=['GET', 'POST'])
+def wait_for_recog():
+    print "wait_for_recog"
+    userid = int(request.args['userid'])
     t = Tropo()
-    t.say('Success')
+    user = User.query.filter_by(userid=userid).first()
+    if len(user.voice_query) > 0:
+        t.say("Your query was " + user.voice_query)
+        t.on(event='continue', next='/load_page?userid={0}'.format(userid))
+    else:
+        t.say("Loading")
+        t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
     return t.RenderJson()
 
-@app.route('/incomplete', methods=['GET', 'POST'])
-def incomplete():
-    print "incomplete"
+@app.route('/load_page', methods=['GET', 'POST'])
+def load_page():
     t = Tropo()
-    t.say('incomplete')
+    t.say("Not implemented")
     return t.RenderJson()
 
-@app.route('/error', methods=['GET', 'POST'])
-def error():
-    print "error"
-    t = Tropo()
-    t.say('error')
-    return t.RenderJson()
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
@@ -85,6 +86,8 @@ def record():
 
     # Test speech recognition
     text = recognize.wav_to_text(wav_filename)
+    if text is None:
+        text = "unknown query"
     print "Text back: ", text
     this_user.voice_query = text
     db.session.commit()
