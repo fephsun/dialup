@@ -63,6 +63,7 @@ def wait_for_recog():
     if len(user.voice_query) > 0:
         print "Query-get!"
         t.say("Your query was " + user.voice_query)
+        print "Got past saying the thing"
         url = im_feeling_lucky(user.voice_query)
         print "URL: ", url
         t.on(event='continue', next='/speak_webpage?url={0}&userid={1}'.format(url, userid))
