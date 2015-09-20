@@ -32,7 +32,11 @@ def _clarifai_tags(url):
         headers={'Authorization': ' Bearer %s' % access_token})
 
     # Consult https://developer.clarifai.com/docs/tag
-    retval = json.loads(response.text)['results'][0]['result']['tag']['classes']
+    try:
+        retval = json.loads(response.text)['results'][0]['result']['tag']['classes']
+    except:
+        print json.loads(response.text)
+        retval = []
 
     # Sometimes Clarifai returns [["tag1", "tag2", "tag3"]] instead of
     # just ["tag1", "tag2", "tag3"].
@@ -107,7 +111,8 @@ class ParsedWebpage(object):
             if link_index < len(self.links) and text == self.links[link_index][0]:
                 new_texts.append("Link %s" % str(link_index))
                 link_index += 1
-            new_texts.append(text)
+            if text.strip() != '':
+                new_texts.append(text)
 
         # This should be the human-readable text of the page.
         self.text = '. '.join(new_texts)
