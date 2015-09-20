@@ -98,10 +98,6 @@ class ParsedWebpage(object):
                       for link in links
                       if link.string]
 
-        # This should be a list of img srcs.
-        imgs = self.soup.find_all('img')
-        self.imgs = [img.get('src', '') for img in imgs]
-
         texts = self.soup.find_all(text=True)
 
         # Add in link labels!
@@ -114,9 +110,7 @@ class ParsedWebpage(object):
             new_texts.append(text)
 
         # This should be the human-readable text of the page.
-        self.text = ' '.join(new_texts)
-        self.texts = texts
-        self.new_texts = new_texts
+        self.text = '. '.join(new_texts)
 
 
         # TODO: forms and related trappings
