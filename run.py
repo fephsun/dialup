@@ -118,12 +118,17 @@ def speak_webpage():
 
     webpage = extract.ParsedWebpage(url)
     page_n = int(request.args['page'])
-    # t.say(webpage.text)
+    if page_n >= len(webpage.chunks):
+        t.say("End of document.")
+        t.on(event='continue', next='/home')
+        return t.RenderJson()
+
+    # Deal with the variety of commands you can use to navigate.
     t.ask(
         choices='link([1-4 DIGITS]), command(next, home)',
         say=webpage.chunks[page_n],
     )
-    t.on(event='continue', next='/deal_with_links?userid={0}&page={1}' \
+    t.on(event='continue', next='/deal_with_links?userid={0}&page={1}'
         .format(userid, page_n))
     return t.RenderJson()
 
@@ -138,12 +143,24 @@ def deal_with_links():
     webpage = extract.ParsedWebpage(url)
 
     # Get the action from last time.
-    print "Request data: ", request.data
     result = Result(request.data)
     if result.getValue() == 'link':
-        t.say("You clicked on a link")
-    elif result.getValue() == 'command':
-        t.say("You issued a command")
+        t.say("Following link.")
+        link_num = int(result.getInterpretation())
+        print "Link number: ", link_num
+        print "New url: ", webpage.links[link_num][1]
+        user.voice_query = webpage.links[link_num][1]
+        db.session.commit()
+        t.on(event='continue', next='/speak_webpage?userid={0}&page={1}'
+            .format(userid, 0))
+
+    elif result.getInterpretation() == 'next':
+        t.say("Going to next page.")
+        t.on(event='continue', next='/speak_webpage?userid={0}&page={1}'
+            .format(userid, page_n + 1))
+    elif result.getInterpretation() == 'home':
+        t.say("Going home.")
+        t.on(event='continue', next='/home')
     else:
         t.say("Unknown command")
 
