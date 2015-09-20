@@ -22,9 +22,13 @@ import requests
 
 import secrets
 
+n_clarify = 0
 def _clarifai_tags(url):
     # TODO: Batch this so that we do one Clarifai request only.
     # Requires, like, deferreds.
+    if n_clarify > 3:
+        return ["unknown"]
+    n_clarify += 1
 
     access_token = secrets.clarifai_access_token
     clarifai_url = "https://api.clarifai.com/v1/tag/?url="
@@ -72,7 +76,6 @@ class ParsedWebpage(object):
         self.title = self.soup.title.string
 
         # Replace images with descriptions of those images.
-        n_clarify = 0
         def my_replace(match):
             raw_tag = match.group()
             img_soup = bs4.BeautifulSoup(raw_tag, "html.parser")
@@ -82,14 +85,13 @@ class ParsedWebpage(object):
             retval = " An image"
             if alt:
                 retval += " of %s" % alt
-            if src and n_clarify < 3:
+            if src:
                 retval += " that looks like "
                 joined_url = urljoin(self.url, src)
                 tags = _clarifai_tags(joined_url)[:4]
                 if len(tags) > 1:
                     tags[-1] = "and " + tags[-1]
                 retval += ' '.join(tags)
-                n_clarify += 1
             return retval + '. '
 
         new_html = re.sub("<img[^>]*\>[^>]*<\\img\>", my_replace, unicode(self.soup))
