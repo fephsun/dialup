@@ -69,7 +69,9 @@ def wait_for_recog():
         print "loading"
         t.say("Loading")
         t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
-    return t.RenderJson()
+    debug_json = t.RenderJson()
+    print debug_json
+    return debug_json
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
