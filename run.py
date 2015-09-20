@@ -145,9 +145,14 @@ def deal_with_links():
     # Get the action from last time.
     result = Result(request.data)
     if result.getValue() == 'link':
-        t.say("Following link.")
         link_num = int(result.getInterpretation())
         print "Link number: ", link_num
+        if link_num >= len(webpage.links):
+            t.say("Invalid link")
+            t.on(event='continue', next='/speak_webpage?user={0}&page={1}'.
+                format(userid, page_n))
+            return t.RenderJson()
+        t.say("Following link.")
         print "New url: ", webpage.links[link_num][1]
         user.voice_query = webpage.links[link_num][1]
         db.session.commit()
@@ -163,7 +168,8 @@ def deal_with_links():
         t.on(event='continue', next='/home')
     else:
         t.say("Unknown command")
-
+        t.on(event='continue', next='/speak_webpage?user={0}&page={1}'.
+            format(userid, page_n))
     return t.RenderJson()
 
 if __name__ == '__main__':
