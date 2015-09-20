@@ -128,6 +128,7 @@ def speak_webpage():
     t.ask(
         choices='link([1-4 DIGITS]), command(next, home)',
         say=webpage.chunks[page_n],
+        bargein=False,
     )
     t.on(event='continue', next='/deal_with_links?userid={0}&page={1}'
         .format(userid, page_n))
