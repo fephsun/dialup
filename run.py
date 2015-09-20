@@ -113,8 +113,8 @@ def speak_webpage():
         return t.RenderJson()
 
     webpage = extract.ParsedWebpage(url)
-    t.say(webpage.text)
-    # t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice = lambda event: say(str(event))))
+    # t.say(webpage.text)
+    t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice=lambda event: say(str(event))))
 
     return t.RenderJson()
 
