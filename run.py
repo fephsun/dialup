@@ -41,7 +41,7 @@ def home():
     t = Tropo()
     t.record(
         name='myrecording',
-        say='speech recognition demo',
+        say="What website to visit? Speak your query for an I'm Feeling Lucky Google search.",
         choices={'terminator': '#'},
         url='http://infinite-cove-6526.herokuapp.com/record?userid={0}' \
             .format(userid),
