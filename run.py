@@ -79,11 +79,11 @@ def record():
     this_user = User.query.filter_by(userid=userid).first()
 
     audio = request.files['filename'].read()
-    out_file = open('./test.wav', 'wb')
+    out_file = open('/tmp/test.wav', 'wb')
     out_file.write(audio)
 
     # Test speech recognition
-    text = recognize.wav_to_text('./text.wav')
+    text = recognize.wav_to_text('/tmp/test.wav')
     print "Text back: ", text
     this_user.voice_query = text
     db.session.commit()
