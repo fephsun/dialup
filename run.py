@@ -135,6 +135,7 @@ def speak_webpage():
 
 @app.route('/deal_with_links', methods=['GET', 'POST'])
 def deal_with_links():
+    print "dealing with link"
     t = Tropo()
     # Load up everything the stupid way.
     userid = int(request.args['userid'])
