@@ -22,32 +22,35 @@ import requests
 
 import secrets
 
-n_clarify = 0
-def _clarifai_tags(url):
-    # TODO: Batch this so that we do one Clarifai request only.
-    # Requires, like, deferreds.
-    if n_clarify > 3:
-        return ["unknown"]
-    n_clarify += 1
+class ClarifaiGetter(object):
+    def __init__(self):
+        self.n_clarifai = 0
 
-    access_token = secrets.clarifai_access_token
-    clarifai_url = "https://api.clarifai.com/v1/tag/?url="
-    response = requests.get(clarifai_url + url,
-        headers={'Authorization': ' Bearer %s' % access_token})
+    def clarifai_tags(self, url):
+        # TODO: Batch this so that we do one Clarifai request only.
+        # Requires, like, deferreds.
+        if self.n_clarifai > 3:
+            return ["unknown"]
+        self.n_clarifai += 1
 
-    # Consult https://developer.clarifai.com/docs/tag
-    try:
-        retval = json.loads(response.text)['results'][0]['result']['tag']['classes']
-    except:
-        print json.loads(response.text)
-        retval = []
+        access_token = secrets.clarifai_access_token
+        clarifai_url = "https://api.clarifai.com/v1/tag/?url="
+        response = requests.get(clarifai_url + url,
+            headers={'Authorization': ' Bearer %s' % access_token})
 
-    # Sometimes Clarifai returns [["tag1", "tag2", "tag3"]] instead of
-    # just ["tag1", "tag2", "tag3"].
-    if len(retval) == 1 and type(retval[0]) == list:
-        return retval[0]
+        # Consult https://developer.clarifai.com/docs/tag
+        try:
+            retval = json.loads(response.text)['results'][0]['result']['tag']['classes']
+        except:
+            print json.loads(response.text)
+            retval = []
 
-    return retval
+        # Sometimes Clarifai returns [["tag1", "tag2", "tag3"]] instead of
+        # just ["tag1", "tag2", "tag3"].
+        if len(retval) == 1 and type(retval[0]) == list:
+            return retval[0]
+
+        return retval
 
 class ParsedWebpage(object):
     def __init__(self, url):
@@ -58,6 +61,7 @@ class ParsedWebpage(object):
         self.url = response.url
 
         self.soup = bs4.BeautifulSoup(self.html, "html.parser")
+        self.clarifai_getter = ClarifaiGetter()
 
         # Delete <script> and <style> tags, comments, and <!DOCTYPE>.
         # For some reason, doing this twice removes some sticky cases.
@@ -88,7 +92,7 @@ class ParsedWebpage(object):
             if src:
                 retval += " that looks like "
                 joined_url = urljoin(self.url, src)
-                tags = _clarifai_tags(joined_url)[:4]
+                tags = self.clarifai_getter.clarifai_tags(joined_url)[:4]
                 if len(tags) > 1:
                     tags[-1] = "and " + tags[-1]
                 retval += ' '.join(tags)
