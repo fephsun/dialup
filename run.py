@@ -58,18 +58,11 @@ def wait_for_recog():
     user = User.query.filter_by(userid=userid).first()
     if len(user.voice_query) > 0:
         t.say("Your query was " + user.voice_query)
-        t.on(event='continue', next='/load_page?userid={0}'.format(userid))
+        t.on(event='continue', next='/speak_webpage?userid={0},'.format(userid))
     else:
         t.say("Loading")
         t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
     return t.RenderJson()
-
-@app.route('/load_page', methods=['GET', 'POST'])
-def load_page():
-    t = Tropo()
-    t.say("Not implemented")
-    return t.RenderJson()
-
 
 @app.route('/record', methods=['GET', 'POST'])
 def record():
@@ -95,15 +88,20 @@ def record():
     return ""
 
 
-@app.route('/speak_webpage')
+@app.route('/speak_webpage', methods=['GET', 'POST'])
 def speak_webpage():
     t = Tropo()
-    url = request.args.get('url', None)
-    if not url:
-        t.say("Server error no URL specified")
-    else:
-        webpage = extract.ParsedWebpage(url)
-        t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice = lambda event: say(str(event))))
+    userid = request.args.get('userid', None)
+    if userid is None:
+        t.say("No user specified.  Error.")
+        return t.RenderJson()
+    userid = int(userid)
+    this_user = User.query.filter_by(userid=userid).first()
+    query = this_user.voice_query
+    url = "???"
+
+    webpage = extract.ParsedWebpage(url)
+    t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice = lambda event: say(str(event))))
 
     return t.RenderJson()
 
