@@ -95,7 +95,7 @@ def record():
 @app.route('/speak_webpage')
 def speak_webpage():
     t = Tropo()
-    url = request.args.get('url', 'http://en.wikipedia.org') # TODO (temporary for testing): replace wikipedia url with None
+    url = request.args.get('url', None)
     if not url:
         t.say("Server error: No URL specified.")
     else:
