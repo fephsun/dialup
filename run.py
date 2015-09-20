@@ -25,6 +25,10 @@ class User(db.Model):
     def __repr__(self):
         return '<User id %d>' % self.userid
 
+def im_feeling_lucky(keywords):
+    google_url = "http://www.google.com/search?q=%s&btnI"
+    return google_url % ('+'.join(keywords))
+
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     # Generate a user cookie value.  This is kept in the url args throughout
