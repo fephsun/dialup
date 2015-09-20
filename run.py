@@ -117,11 +117,11 @@ def speak_webpage():
     url = im_feeling_lucky(user.voice_query)
 
     webpage = extract.ParsedWebpage(url)
-    # t.say(webpage.text)
-    t.ask(Choices('[1-4 DIGITS]'),
-        say=webpage.text,
-        bargein=False,
-        onChoice=lambda event: say(str(event)))
+    t.say(webpage.text)
+    # t.ask(Choices('[1-4 DIGITS]'),
+    #     say=webpage.text,
+    #     bargein=False,
+    #     onChoice=lambda event: say(str(event)))
 
     return t.RenderJson()
 
