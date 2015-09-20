@@ -110,6 +110,7 @@ def speak_webpage():
     userid = request.args.get('userid', None)
     if userid is None:
         t.say("No user specified. Error.")
+        t.on(event='continue', next='/home')
         return t.RenderJson()
     userid = int(userid)
     user = User.query.filter_by(userid=userid).first()
@@ -149,8 +150,8 @@ def deal_with_links():
         print "Link number: ", link_num
         if link_num >= len(webpage.links):
             t.say("Invalid link")
-            t.on(event='continue', next='/speak_webpage?user={0}&page={1}'.
-                format(userid, page_n))
+            t.on(event='continue', next='/speak_webpage?userid={0}&page={1}'
+                .format(userid, page_n))
             return t.RenderJson()
         t.say("Following link.")
         print "New url: ", webpage.links[link_num][1]
@@ -168,8 +169,8 @@ def deal_with_links():
         t.on(event='continue', next='/home')
     else:
         t.say("Unknown command")
-        t.on(event='continue', next='/speak_webpage?user={0}&page={1}'.
-            format(userid, page_n))
+        t.on(event='continue', next='/speak_webpage?userid={0}&page={1}'
+            .format(userid, page_n))
     return t.RenderJson()
 
 if __name__ == '__main__':
