@@ -81,13 +81,13 @@ class ParsedWebpage(object):
             retval = " An image"
             if alt:
                 retval += " of %s" % alt
-            # if src:
-            #     retval += " that looks like "
-            #     joined_url = urljoin(url, src)
-            #     tags = _clarifai_tags(joined_url)[:5]
-            #     if len(tags) > 1:
-            #         tags[-1] = "and " + tags[-1]
-            #     retval += ', '.join(tags)
+            if src:
+                retval += " that looks like "
+                joined_url = urljoin(url, src)
+                tags = _clarifai_tags(joined_url)[:4]
+                if len(tags) > 1:
+                    tags[-1] = "and " + tags[-1]
+                retval += ', '.join(tags)
             return retval + '. '
 
         new_html = re.sub("<img[^>]*\>[^>]*<\\img\>", my_replace, unicode(self.soup))
@@ -115,7 +115,7 @@ class ParsedWebpage(object):
                 new_texts.append(text)
 
         # This should be the human-readable text of the page.
-        self.text = '. '.join(new_texts)
+        self.text = ' '.join(new_texts)
 
         max_chunk_length = 1000 # characters
         self.chunks = [""]
@@ -124,7 +124,7 @@ class ParsedWebpage(object):
             if len(self.chunks[current_chunk]) + len(text) > max_chunk_length:
                 self.chunks.append("")
                 current_chunk += 1
-            self.chunks[current_chunk] += text + '. '
+            self.chunks[current_chunk] += text + ' '
 
 
         # TODO: forms and related trappings
