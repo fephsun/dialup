@@ -3,7 +3,7 @@ import logging
 import random
 from flask import Flask, Response, request, url_for, send_file
 from flask.ext.sqlalchemy import SQLAlchemy
-from tropo import Tropo
+from tropo import Tropo, Choices
 
 import extract
 
