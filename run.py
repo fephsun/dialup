@@ -49,21 +49,21 @@ def home():
     t.on(event='error', next='/error')
     return t.RenderJson()
 
-@app.route('/success')
+@app.route('/success', methods=['GET', 'POST'])
 def success():
     print "success"
     t = Tropo()
     t.say('Success')
     return t.RenderJson()
 
-@app.route('/incomplete')
+@app.route('/incomplete', methods=['GET', 'POST'])
 def incomplete():
     print "incomplete"
     t = Tropo()
     t.say('incomplete')
     return t.RenderJson()
 
-@app.route('/error')
+@app.route('/error', methods=['GET', 'POST'])
 def error():
     print "error"
     t = Tropo()
