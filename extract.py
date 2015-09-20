@@ -107,7 +107,8 @@ class ParsedWebpage(object):
             if link_index < len(self.links) and text == self.links[link_index][0]:
                 new_texts.append("Link %s" % str(link_index))
                 link_index += 1
-            new_texts.append(text)
+            if text.strip() != '':
+                new_texts.append(text)
 
         # This should be the human-readable text of the page.
         self.text = '. '.join(new_texts)
