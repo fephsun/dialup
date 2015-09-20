@@ -109,7 +109,7 @@ class ParsedWebpage(object):
         new_texts = []
         for text in texts:
             if link_index < len(self.links) and text == self.links[link_index][0]:
-                # new_texts.append("Link %s" % str(link_index))
+                new_texts.append("Link %s" % str(link_index))
                 link_index += 1
             if text.strip() != '':
                 new_texts.append(text)
