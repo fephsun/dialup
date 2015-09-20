@@ -3,7 +3,9 @@ import logging
 import random
 from flask import Flask, Response, request, url_for, send_file
 from flask.ext.sqlalchemy import SQLAlchemy
-from tropo import Tropo 
+from tropo import Tropo
+
+import extract
 
 root = logging.getLogger()
 log = logging.StreamHandler(sys.stdout)
@@ -80,6 +82,19 @@ def record():
     out_file.write(audio)
     db.session.commit()
     return ""
+
+
+@app.route('/speak_webpage')
+def speak_webpage():
+    t = Tropo()
+    url = request.args.get('url', 'http://en.wikipedia.org') # TODO (temporary for testing): replace wikipedia url with None
+    if url:
+        t.say("Server error: No URL specified.")
+    else:
+        webpage = extract.ParsedWebpage(url)
+        t.say(webpage.text)
+
+    return t.RenderJson()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
