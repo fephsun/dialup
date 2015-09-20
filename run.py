@@ -63,7 +63,7 @@ def wait_for_recog():
     if len(user.voice_query) > 0:
         t.say("Your query was " + user.voice_query)
         url = im_feeling_lucky(user.voice_query)
-        t.on(event='continue', next='/speak_webpage?url={0},'.format(url))
+        t.on(event='continue', next='/speak_webpage?url={0}&userid={1},'.format(url, userid))
     else:
         t.say("Loading")
         t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
@@ -98,12 +98,15 @@ def speak_webpage():
     t = Tropo()
     userid = request.args.get('userid', None)
     if userid is None:
-        t.say("No user specified.  Error.")
+        t.say("No user specified. Error.")
         return t.RenderJson()
     userid = int(userid)
     this_user = User.query.filter_by(userid=userid).first()
     query = this_user.voice_query
-    url = "???"
+    url = request.args.get('url', None)
+    if not url:
+        t.say("No URL specified. Server error.")
+        return t.RenderJson()
 
     webpage = extract.ParsedWebpage(url)
     t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice = lambda event: say(str(event))))
