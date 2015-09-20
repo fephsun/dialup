@@ -63,16 +63,12 @@ def wait_for_recog():
     if len(user.voice_query) > 0:
         print "Query-get!"
         t.say("Your query was " + user.voice_query)
-        print "Got past saying the thing"
-        url = im_feeling_lucky(user.voice_query)
-        print "URL: ", url
-        t.on(event='continue', next='/speak_webpage?url={0}&userid={1}'.format(url, userid))
+        t.on(event='continue', next='/speak_webpage?userid={0}'.format(userid))
     else:
         print "loading"
         t.say("Loading")
         t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
     debug_json = t.RenderJson()
-    print debug_json
     return debug_json
 
 @app.route('/record', methods=['GET', 'POST'])
@@ -109,10 +105,7 @@ def speak_webpage():
         return t.RenderJson()
     userid = int(userid)
 
-    url = request.args.get('url', None)
-    if not url:
-        t.say("No URL specified. Server error.")
-        return t.RenderJson()
+    url = im_feeling_lucky(user.voice_query)
 
     webpage = extract.ParsedWebpage(url)
     # t.say(webpage.text)
