@@ -3,7 +3,7 @@ import logging
 import random
 from flask import Flask, Response, request, url_for, send_file
 from flask.ext.sqlalchemy import SQLAlchemy
-from tropo import Tropo, Choices
+from tropo import Tropo, Result
 
 import extract
 import recognize
@@ -119,10 +119,34 @@ def speak_webpage():
     webpage = extract.ParsedWebpage(url)
     page_n = int(request.args['page'])
     # t.say(webpage.text)
-    t.ask(Choices('[1-4 DIGITS]'),
+    t.ask(
+        choices='link([1-4 DIGITS]), command(next, home)',
         say=webpage.chunks[page_n],
-        bargein=False,
-        onChoice=lambda event: say(str(event)))
+    )
+    t.on(event='continue', next='/deal_with_links?userid={0}&page={1}' \
+        .format(userid, page_n))
+    return t.RenderJson()
+
+@app.route('/deal_with_links', methods=['GET', 'POST'])
+def deal_with_links():
+    t = Tropo()
+    # Load up everything the stupid way.
+    userid = int(request.args['userid'])
+    page_n = int(request.args['page'])
+    user = User.query.filter_by(userid=userid).first()
+    url = im_feeling_lucky(user.voice_query)
+    webpage = extract.ParsedWebpage(url)
+
+    # Get the action from last time.
+    print request.form
+    result = Result(request.form)
+    if result.getValue() == 'link':
+        t.say("You clicked on a link")
+    elif result.getValue() == 'command':
+        t.say("You issued a command")
+    else:
+        t.say("Unknown command")
+
     return t.RenderJson()
 
 if __name__ == '__main__':
