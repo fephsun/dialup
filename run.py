@@ -97,7 +97,7 @@ def speak_webpage():
     t = Tropo()
     url = request.args.get('url', None)
     if not url:
-        t.say("Server error: No URL specified.")
+        t.say("Server error no URL specified")
     else:
         webpage = extract.ParsedWebpage(url)
         t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice = lambda event: say(str(event))))
