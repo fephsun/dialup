@@ -47,11 +47,11 @@ def _clarifai_tags(url):
 
 class ParsedWebpage(object):
     def __init__(self, url):
-        self.url = url
 
         # Raw HTML
         response = requests.get(url)
         self.html = response.text
+        self.url = response.url
 
         self.soup = bs4.BeautifulSoup(self.html, "html.parser")
 
