@@ -3,7 +3,7 @@ import logging
 import random
 from flask import Flask, Response, request, url_for, send_file
 from flask.ext.sqlalchemy import SQLAlchemy
-from tropo import Tropo
+from tropo import Tropo, Choices
 
 import extract
 
@@ -98,15 +98,12 @@ def record():
 @app.route('/speak_webpage')
 def speak_webpage():
     t = Tropo()
-    url = request.args.get('url', 'http://en.wikipedia.org') # TODO (temporary for testing): replace wikipedia url with None
+    url = request.args.get('url', None)
     if not url:
         t.say("Server error: No URL specified.")
     else:
         webpage = extract.ParsedWebpage(url)
-        t.ask(webpage.text, {
-            'choices': "[1-4 DIGITS]",
-            'onChoice': lambda event: say(str(event)),
-        })
+        t.ask(Choices(webpage.text, choices='[1-4 DIGITS]', onChoice = lambda event: say(str(event))))
 
     return t.RenderJson()
 
