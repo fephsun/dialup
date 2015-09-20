@@ -64,7 +64,8 @@ def wait_for_recog():
         print "Query-get!"
         t.say("Your query was " + user.voice_query)
         url = im_feeling_lucky(user.voice_query)
-        t.on(event='continue', next='/speak_webpage?url={0}'.format(url))
+        print "URL: ", url
+        t.on(event='continue', next='/speak_webpage?url={0}&userid={1}'.format(url, userid))
     else:
         print "loading"
         t.say("Loading")
@@ -101,11 +102,11 @@ def record():
 def speak_webpage():
     print "speak_webpage"
     t = Tropo()
-    # userid = request.args.get('userid', None)
-    # if userid is None:
-    #     t.say("No user specified. Error.")
-    #     return t.RenderJson()
-    # userid = int(userid)
+    userid = request.args.get('userid', None)
+    if userid is None:
+        t.say("No user specified. Error.")
+        return t.RenderJson()
+    userid = int(userid)
 
     url = request.args.get('url', None)
     if not url:
