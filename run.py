@@ -123,7 +123,7 @@ def speak_webpage():
         choices='link([1-4 DIGITS]), command(next, home)',
         say=webpage.chunks[page_n],
     )
-    t.on(event='continue', next='/deal_with_links&userid={0}&page={1}' \
+    t.on(event='continue', next='/deal_with_links?userid={0}&page={1}' \
         .format(userid, page_n))
     return t.RenderJson()
 
