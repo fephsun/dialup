@@ -47,7 +47,7 @@ def home():
             .format(userid),
         asyncUpload=True,
         maxTime=10,
-        maxSilence=2,
+        maxSilence=3,
     )
     t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
     t.on(event='incomplete', next='/home')
@@ -61,12 +61,14 @@ def wait_for_recog():
     t = Tropo()
     user = User.query.filter_by(userid=userid).first()
     if len(user.voice_query) > 0:
+        print "Query-get!"
         t.say("Your query was " + user.voice_query)
         url = im_feeling_lucky(user.voice_query)
         print "line 66"
         t.on(event='continue', next='/speak_webpage?url={0}&userid={1}'.format(url, userid))
         print "line 68"
     else:
+        print "loading"
         t.say("Loading")
         t.on(event='continue', next='/wait_for_recog?userid={0}'.format(userid))
     return t.RenderJson()
