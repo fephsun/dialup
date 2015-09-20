@@ -117,6 +117,15 @@ class ParsedWebpage(object):
         # This should be the human-readable text of the page.
         self.text = '. '.join(new_texts)
 
+        max_chunk_length = 1000 # characters
+        self.chunks = [""]
+        current_chunk = 0
+        for text in new_texts:
+            if len(self.chunks[current_chunk]) + len(text) > max_chunk_length:
+                self.chunks.append("")
+                current_chunk += 1
+            self.chunks[current_chunk] += text + '. '
+
 
         # TODO: forms and related trappings
         # TODO: iframes?
