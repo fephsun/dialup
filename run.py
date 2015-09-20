@@ -147,6 +147,14 @@ def deal_with_links():
 
     # Get the action from last time.
     result = Result(request.data)
+    try:
+        result.getValue()
+    except KeyError:
+        t.say("Going to next page.")
+        t.on(event='continue', next='/speak_webpage?userid={0}&page={1}'
+            .format(userid, page_n + 1))
+        return t.RenderJson()
+
     if result.getValue() == 'link':
         link_num = int(result.getInterpretation())
         print "Link number: ", link_num
