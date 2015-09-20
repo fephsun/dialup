@@ -47,11 +47,11 @@ def _clarifai_tags(url):
 
 class ParsedWebpage(object):
     def __init__(self, url):
-        self.url = url
 
         # Raw HTML
         response = requests.get(url)
         self.html = response.text
+        self.url = response.url
 
         self.soup = bs4.BeautifulSoup(self.html, "html.parser")
 
@@ -81,13 +81,13 @@ class ParsedWebpage(object):
             retval = " An image"
             if alt:
                 retval += " of %s" % alt
-            if src:
-                retval += " that looks like "
-                joined_url = urljoin(url, src)
-                tags = _clarifai_tags(joined_url)[:5]
-                if len(tags) > 1:
-                    tags[-1] = "and " + tags[-1]
-                retval += ', '.join(tags)
+            # if src:
+            #     retval += " that looks like "
+            #     joined_url = urljoin(url, src)
+            #     tags = _clarifai_tags(joined_url)[:5]
+            #     if len(tags) > 1:
+            #         tags[-1] = "and " + tags[-1]
+            #     retval += ', '.join(tags)
             return retval + '. '
 
         new_html = re.sub("<img[^>]*\>[^>]*<\\img\>", my_replace, unicode(self.soup))
