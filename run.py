@@ -78,13 +78,13 @@ def record():
 
     audio = request.files['filename'].read()
     out_file = open('./test.wav', 'wb')
-    this_user.voice_query = audio
     out_file.write(audio)
-    db.session.commit()
 
     # Test speech recognition
     text = recognize.wav_to_text('./text.wav')
     print "Text back: ", text
+    this_user.voice_query = text
+    db.session.commit()
 
     return ""
 
