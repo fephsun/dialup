@@ -32,7 +32,11 @@ def _clarifai_tags(url):
         headers={'Authorization': ' Bearer %s' % access_token})
 
     # Consult https://developer.clarifai.com/docs/tag
-    retval = json.loads(response.text)['results'][0]['result']['tag']['classes']
+    try:
+        retval = json.loads(response.text)['results'][0]['result']['tag']['classes']
+    except:
+        print json.loads(response.text)
+        retval = []
 
     # Sometimes Clarifai returns [["tag1", "tag2", "tag3"]] instead of
     # just ["tag1", "tag2", "tag3"].
