@@ -6,13 +6,16 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from tropo import Tropo, Choices
 
 import extract
-
 import recognize
 
+# Log all the bad things.
 root = logging.getLogger()
 log = logging.StreamHandler(sys.stdout)
 log.setLevel(logging.DEBUG)
 root.addHandler(log)
+
+# A magic string for bad queries...
+BAD_QUERY = "BAD_QUERY"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
@@ -60,7 +63,11 @@ def wait_for_recog():
     userid = int(request.args['userid'])
     t = Tropo()
     user = User.query.filter_by(userid=userid).first()
-    if len(user.voice_query) > 0:
+    if user.voice_query == BAD_QUERY:
+        print "Bad query"
+        t.say("We couldn't understand you.")
+        t.on(event='continue', next='/home')
+    elif len(user.voice_query) > 0:
         print "Query-get!"
         t.say("Your query was " + user.voice_query)
         t.on(event='continue', next='/speak_webpage?userid={0}'.format(userid))
@@ -88,7 +95,7 @@ def record():
     # Test speech recognition
     text = recognize.wav_to_text(wav_filename)
     if text is None:
-        text = "unknown query"
+        text = BAD_QUERY
     print "Text back: ", text
     this_user.voice_query = text
     db.session.commit()
