@@ -29,14 +29,16 @@ class ClarifaiGetter(object):
     def clarifai_tags(self, url):
         # TODO: Batch this so that we do one Clarifai request only.
         # Requires, like, deferreds.
-        if self.n_clarifai > 3:
-            return ["unknown"]
+        if self.n_clarifai > 4:
+            return []
         self.n_clarifai += 1
 
         access_token = secrets.clarifai_access_token
         clarifai_url = "https://api.clarifai.com/v1/tag/?url="
         response = requests.get(clarifai_url + url,
-            headers={'Authorization': ' Bearer %s' % access_token})
+            headers={
+                'Authorization': ' Bearer %s' % access_token,
+            })
 
         # Consult https://developer.clarifai.com/docs/tag
         try:
@@ -56,7 +58,9 @@ class ParsedWebpage(object):
     def __init__(self, url):
 
         # Raw HTML
-        response = requests.get(url)
+        response = requests.get(url, verify=False, headers={
+            'User-agent': 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 5_1_1 like Mac OS X; en) AppleWebKit/534.46.0 (KHTML, like Gecko) CriOS/19.0.1084.60 Mobile/9B206 Safari/7534.48.3',
+        })
         self.html = response.text
         self.url = response.url
 
@@ -89,13 +93,14 @@ class ParsedWebpage(object):
             retval = " An image"
             if alt:
                 retval += " of %s" % alt
-            if src:
-                retval += " that looks like "
+            elif src:
                 joined_url = urljoin(self.url, src)
                 tags = self.clarifai_getter.clarifai_tags(joined_url)[:4]
                 if len(tags) > 1:
                     tags[-1] = "and " + tags[-1]
-                retval += ' '.join(tags)
+                if len(tags) > 0:
+                    retval += " that looks like "
+                    retval += ' '.join(tags)
             return retval + '. '
 
         new_html = re.sub("<img[^>]*\>[^>]*<\\img\>", my_replace, unicode(self.soup))
