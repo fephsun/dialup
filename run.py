@@ -44,26 +44,26 @@ def home():
         asyncUpload=True,
         maxTime=10,
     )
-    t.on(event='continue', next='./success')
-    t.on(event='incomplete', next='./incomplete')
-    t.on(event='error', next='./error')
+    t.on(event='continue', next='/success')
+    t.on(event='incomplete', next='/incomplete')
+    t.on(event='error', next='/error')
     return t.RenderJson()
 
-@app.route('/success')
+@app.route('/success', methods=['GET', 'POST'])
 def success():
     print "success"
     t = Tropo()
     t.say('Success')
     return t.RenderJson()
 
-@app.route('/incomplete')
+@app.route('/incomplete', methods=['GET', 'POST'])
 def incomplete():
     print "incomplete"
     t = Tropo()
     t.say('incomplete')
     return t.RenderJson()
 
-@app.route('/error')
+@app.route('/error', methods=['GET', 'POST'])
 def error():
     print "error"
     t = Tropo()
@@ -79,11 +79,12 @@ def record():
     this_user = User.query.filter_by(userid=userid).first()
 
     audio = request.files['filename'].read()
-    out_file = open('/tmp/test.wav', 'wb')
+    wav_filename = '/tmp/test{0}.wav'.format(userid)
+    out_file = open(wav_filename, 'wb')
     out_file.write(audio)
 
     # Test speech recognition
-    text = recognize.wav_to_text('/tmp/test.wav')
+    text = recognize.wav_to_text(wav_filename)
     print "Text back: ", text
     this_user.voice_query = text
     db.session.commit()
