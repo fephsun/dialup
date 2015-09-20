@@ -113,16 +113,19 @@ def speak_webpage():
         return t.RenderJson()
     userid = int(userid)
     user = User.query.filter_by(userid=userid).first()
+    print "found user"
 
     url = im_feeling_lucky(user.voice_query)
+    print "got url"
 
     webpage = extract.ParsedWebpage(url)
-    t.say(webpage.text)
-    # t.ask(Choices('[1-4 DIGITS]'),
-    #     say=webpage.text,
-    #     bargein=False,
-    #     onChoice=lambda event: say(str(event)))
-
+    print "got webpage"
+    # t.say(webpage.text)
+    t.ask(Choices('[1-4 DIGITS]'),
+        say=webpage.text,
+        bargein=False,
+        onChoice=lambda event: say(str(event)))
+    print "done"
     return t.RenderJson()
 
 if __name__ == '__main__':
