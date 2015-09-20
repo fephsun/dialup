@@ -70,7 +70,7 @@ def wait_for_recog():
     elif len(user.voice_query) > 0:
         print "Query-get!"
         t.say("Your query was " + user.voice_query)
-        t.on(event='continue', next='/speak_webpage?userid={0}'.format(userid))
+        t.on(event='continue', next='/speak_webpage?userid={0}&page=0'.format(userid))
     else:
         print "loading"
         t.say("Loading")
@@ -117,9 +117,10 @@ def speak_webpage():
     url = im_feeling_lucky(user.voice_query)
 
     webpage = extract.ParsedWebpage(url)
+    page_n = int(request.args['page'])
     # t.say(webpage.text)
     t.ask(Choices('[1-4 DIGITS]'),
-        say=webpage.text,
+        say=webpage.chunks[page_n],
         bargein=False,
         onChoice=lambda event: say(str(event)))
     return t.RenderJson()
